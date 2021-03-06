@@ -1,13 +1,17 @@
 version: "3"
 
 services:
-  web:
+  nextjs-front:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: web
+    container_name: nextjs-front
+    user: node
     restart: always
+    command: "npm run dev"
     volumes:
       - ./src:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
     ports:
       - "3001:3000"
