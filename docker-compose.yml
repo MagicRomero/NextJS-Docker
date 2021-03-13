@@ -1,5 +1,9 @@
 version: "3"
 
+networks:
+  frontend:
+    driver: bridge
+
 services:
   nginx:
     container_name: nginx-next
@@ -9,6 +13,12 @@ services:
     restart: unless-stopped
     ports:
       - 3001:80
+    depends_on:
+      - nextjs
+      - mongo
+    networks:
+      - frontend
+
   nextjs:
     container_name: nextjs
     build:
@@ -16,7 +26,23 @@ services:
       dockerfile: Dockerfile
     user: node
     restart: unless-stopped
+    depends_on:
+      - mongo
     volumes:
       - ./src:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/.next
+    networks:
+      - frontend
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    tty: true
+    restart: always
+    volumes:
+      - ./database:/data/db
+    ports:
+      - "27018:27017"
+    networks:
+      - frontend
